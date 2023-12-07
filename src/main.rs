@@ -1,12 +1,14 @@
-use std::{env, process};
+use std::collections::HashMap;
+use std::env;
+use std::process;
 
-#[allow(dead_code)]
+/*** TODO: Connect to a sqlite database and save todos there ***/
+
 struct Todo {
     title: String,
     done: bool,
 }
 
-#[allow(dead_code)]
 impl Todo {
     fn new(title: String) -> Self {
         Self { title, done: false }
@@ -32,7 +34,7 @@ fn print_help() {
 }
 
 /* Modurality to improve */
-fn parse_args(args: &Vec<String>) {
+fn parse_args(args: &Vec<String>, todos: &mut HashMap<String, Todo>) {
     if args.len() < 2 {
         panic!("Invalid number of arguments!")
     }
@@ -43,14 +45,12 @@ fn parse_args(args: &Vec<String>) {
                 eprintln!("Invalid number of args for adding a new todo!");
                 print_help();
             }
-            println!("Adding a new todo!");
             match &args[2][..] {
-                "-t" | "--title" => {
-                    println!("The title is provided, proceed!");
-                    match &args[3][..] {
-                        title => println!("The title of the todo is: {}", title),
+                "-t" | "--title" => match &args[3][..] {
+                    title => {
+                        todos.insert(title.to_string(), Todo::new(title.to_owned()));
                     }
-                }
+                },
                 _ => {
                     eprintln!("Invalid option provided after `add`!");
                     print_help();
@@ -88,20 +88,28 @@ fn parse_args(args: &Vec<String>) {
                     match &args[3][..] {
                         title => println!("Title: {}", title),
                     }
-                },
+                }
                 _ => {
                     eprintln!("Invalid option provided after `edit`");
                     print_help();
                 }
             }
-        },
+        }
         "list" => {
             if args.len() > 2 {
                 eprintln!("Uncessary extra arguments provided.");
                 print_help();
             }
-            println!("Listing all todos");
-        },
+            println!("Todos:");
+            for todo in todos.values() {
+                print!("{} ,", todo.title);
+                if todo.done {
+                    println!("#");
+                } else {
+                    println!("*");
+                }
+            }
+        }
         "-h" | "--help" => print_help(),
         _ => {
             eprintln!("Invalid argument!");
@@ -113,20 +121,9 @@ fn parse_args(args: &Vec<String>) {
 fn main() {
     // Get the arguments from the environment
     let args: Vec<String> = env::args().collect();
-
-    parse_args(&args);
-
-    /*
     let mut todos = HashMap::new();
 
-    todos.insert(String::from("Hello"), Todo::new(String::from("Hello")));
-
-    // let todos: Vec<Todo> = vec![Todo::new(String::from("Hello World!"))];
-
-    for todo in todos.values() {
-        println!("title: {}", todo.title);
-    }
-    */
+    parse_args(&args, &mut todos);
 
     // Add todo prototype cmd => ./todo-app add -t "Fix a bug"
     // Remove todo prototype => ./todo-app remove -t "Fix a bug"
