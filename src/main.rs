@@ -9,10 +9,7 @@ struct Todo {
 #[allow(dead_code)]
 impl Todo {
     fn new(title: String) -> Self {
-        Self {
-            title,
-            done: false,
-        }
+        Self { title, done: false }
     }
 }
 
@@ -36,45 +33,89 @@ fn print_help() {
 
 /* Modurality to improve */
 fn parse_args(args: &Vec<String>) {
-    if args.len() < 2 { panic!("Invalid number of arguments!") }
+    if args.len() < 2 {
+        panic!("Invalid number of arguments!")
+    }
 
     match &args[1][..] {
         "add" => {
-            if args.len() > 4 { 
+            if args.len() > 4 {
                 eprintln!("Invalid number of args for adding a new todo!");
                 print_help();
             }
             println!("Adding a new todo!");
             match &args[2][..] {
-                "-t" | "--title" => { 
+                "-t" | "--title" => {
                     println!("The title is provided, proceed!");
                     match &args[3][..] {
                         title => println!("The title of the todo is: {}", title),
                     }
+                }
+                _ => {
+                    eprintln!("Invalid option provided after `add`!");
+                    print_help();
+                }
+            }
+        }
+        "remove" => {
+            if args.len() > 4 {
+                eprintln!("Uncessary extra args provided!");
+                print_help();
+            }
+            println!("Removing todo!");
+            match &args[2][..] {
+                "-t" | "--title" => {
+                    println!("Title to be removed ptovided");
+                    match &args[3][..] {
+                        title => println!("Title: {}", title),
+                    }
+                }
+                _ => {
+                    eprintln!("Invalid option provided after `remove`");
+                    print_help();
+                }
+            }
+        }
+        "edit" => {
+            if args.len() > 4 {
+                eprintln!("Uncessary extra arguments provided!");
+                print_help();
+            }
+            println!("Entering editor mode.");
+            match &args[2][..] {
+                "-t" | "--title" => {
+                    println!("Title to be updated provided");
+                    match &args[3][..] {
+                        title => println!("Title: {}", title),
+                    }
                 },
                 _ => {
-                    eprintln!("Invalid option provided!");
+                    eprintln!("Invalid option provided after `edit`");
                     print_help();
-                },
+                }
             }
         },
-        "remove" => println!("Removing a todo!"),
-        "edit" => println!("Editing a todo!"),
-        "list" => println!("Listing all todos!"),
+        "list" => {
+            if args.len() > 2 {
+                eprintln!("Uncessary extra arguments provided.");
+                print_help();
+            }
+            println!("Listing all todos");
+        },
         "-h" | "--help" => print_help(),
         _ => {
             eprintln!("Invalid argument!");
             print_help();
-        },
-    }   
+        }
+    }
 }
 
 fn main() {
     // Get the arguments from the environment
     let args: Vec<String> = env::args().collect();
-    
+
     parse_args(&args);
-    
+
     /*
     let mut todos = HashMap::new();
 
@@ -86,7 +127,6 @@ fn main() {
         println!("title: {}", todo.title);
     }
     */
-
 
     // Add todo prototype cmd => ./todo-app add -t "Fix a bug"
     // Remove todo prototype => ./todo-app remove -t "Fix a bug"
