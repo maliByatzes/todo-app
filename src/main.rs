@@ -30,6 +30,9 @@ fn print_help() {
     println!("");
     println!("Examples:");
     println!("    todo-app add -t \"Add a feature\"");
+    println!("    todo-app remove -t \"Add a feature\"");
+    println!("    todo-app edit -t \"Add a feature\"");
+    println!("    todo-app list");
     process::exit(1);
 }
 
@@ -62,12 +65,12 @@ fn parse_args(args: &Vec<String>, todos: &mut HashMap<String, Todo>) {
                 eprintln!("Uncessary extra args provided!");
                 print_help();
             }
-            println!("Removing todo!");
             match &args[2][..] {
                 "-t" | "--title" => {
-                    println!("Title to be removed ptovided");
                     match &args[3][..] {
-                        title => println!("Title: {}", title),
+                        title => {
+                            todos.remove(title);
+                        },
                     }
                 }
                 _ => {
@@ -81,7 +84,6 @@ fn parse_args(args: &Vec<String>, todos: &mut HashMap<String, Todo>) {
                 eprintln!("Uncessary extra arguments provided!");
                 print_help();
             }
-            println!("Entering editor mode.");
             match &args[2][..] {
                 "-t" | "--title" => {
                     println!("Title to be updated provided");
