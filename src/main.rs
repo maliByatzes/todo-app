@@ -1,3 +1,4 @@
+use rusqlite::{Connection, Result};
 use std::collections::HashMap;
 use std::env;
 use std::process;
@@ -66,13 +67,11 @@ fn parse_args(args: &Vec<String>, todos: &mut HashMap<String, Todo>) {
                 print_help();
             }
             match &args[2][..] {
-                "-t" | "--title" => {
-                    match &args[3][..] {
-                        title => {
-                            todos.remove(title);
-                        },
+                "-t" | "--title" => match &args[3][..] {
+                    title => {
+                        todos.remove(title);
                     }
-                }
+                },
                 _ => {
                     eprintln!("Invalid option provided after `remove`");
                     print_help();
@@ -120,15 +119,23 @@ fn parse_args(args: &Vec<String>, todos: &mut HashMap<String, Todo>) {
     }
 }
 
-fn main() {
+fn main() -> Result<()> {
     // Get the arguments from the environment
     let args: Vec<String> = env::args().collect();
     let mut todos = HashMap::new();
 
     parse_args(&args, &mut todos);
+    
+    let conn = Connection::open("../todos.db")?;
 
-    // Add todo prototype cmd => ./todo-app add -t "Fix a bug"
-    // Remove todo prototype => ./todo-app remove -t "Fix a bug"
-    // Edit todo prototype => ./todo-app edit -t "Fix a bug"
-    // List todos prototype => ./todo-app list
+    conn.execute(
+        "create table if not exists todos (
+            id integer primary key autoincrement,
+            title text not null,
+            status boolean not null default false
+            )",
+        [],
+    )?;
+
+    Ok(())
 }
